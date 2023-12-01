@@ -1,0 +1,21 @@
+{
+    "name": "matthewyknowles/who-watches-the-watchmen",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Matthew Knowles",
+            "email": "matthewyknowles@gmail.com"
+        }
+    ],
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.4.2"
+    }
+}
