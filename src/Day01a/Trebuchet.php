@@ -7,17 +7,22 @@ class Trebuchet
 {
     public function determineCalibrationValue(string $calibrationDocument): int
     {
-        $onlyDigits = preg_replace('~\D~', '', $calibrationDocument);
-        $digitsLength = strlen($onlyDigits);
-        if ($digitsLength > 2) {
-            $firstDigit = $onlyDigits[0];
-            $lastDigit = $onlyDigits[$digitsLength-1];
-            return $firstDigit*10 + $lastDigit;
+        $total = 0;
+        $lines = explode("\n", $calibrationDocument);
+        foreach ($lines as $line) {
+            $onlyDigits = preg_replace('~\D~', '', $line);
+            $digitsLength = strlen($onlyDigits);
+            if ($digitsLength > 2) {
+                $firstDigit = $onlyDigits[0];
+                $lastDigit = $onlyDigits[$digitsLength-1];
+                return $firstDigit*10 + $lastDigit;
+            }
+            if ($digitsLength === 2) {
+                return (int) $onlyDigits;
+            }
+            $singleDigit = (int) $onlyDigits;
+            $total += $singleDigit*10 + $singleDigit;
         }
-        if ($digitsLength === 2) {
-            return (int) $onlyDigits;
-        }
-        $singleDigit = (int) $onlyDigits;
-        return $singleDigit*10 + $singleDigit;
+        return $total;
     }
 }

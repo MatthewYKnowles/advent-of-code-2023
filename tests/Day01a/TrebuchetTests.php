@@ -53,8 +53,8 @@ class TrebuchetTests extends TestCase
     public function testWithMultipleLines(): void {
         $trebuchet = new Trebuchet();
         $calibrationDocument =
-            '1
-            2';
+"1
+2";
 
         $result = $trebuchet->determineCalibrationValue($calibrationDocument);
 
