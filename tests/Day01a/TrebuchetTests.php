@@ -13,6 +13,6 @@ class TrebuchetTests extends TestCase
 
         $result = $trebuchet->determineCalibrationValue($calibrationDocument);
 
-        $this->assertEquals(11, $result);
+        $this->assertSame(11, $result);
     }
 }
