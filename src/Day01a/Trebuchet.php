@@ -15,13 +15,14 @@ class Trebuchet
             if ($digitsLength > 2) {
                 $firstDigit = $onlyDigits[0];
                 $lastDigit = $onlyDigits[$digitsLength-1];
-                return $firstDigit*10 + $lastDigit;
+                $total += $firstDigit*10 + $lastDigit;
             }
-            if ($digitsLength === 2) {
-                return (int) $onlyDigits;
+            elseif ($digitsLength === 2) {
+                $total += (int) $onlyDigits;
+            } else {
+                $singleDigit = (int) $onlyDigits;
+                $total += $singleDigit*10 + $singleDigit;
             }
-            $singleDigit = (int) $onlyDigits;
-            $total += $singleDigit*10 + $singleDigit;
         }
         return $total;
     }
