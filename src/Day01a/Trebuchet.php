@@ -25,7 +25,7 @@ class Trebuchet
         return $firstDigitInTheTensPlace + $lastDigit;
     }
 
-    public function replaceEnglishNumbersWithArabicNumbers(string $calibrationDocument): string|array|null
+    public function replaceEnglishNumbersWithArabicNumbers(string $calibrationDocument): string
     {
         return preg_replace(['/one/', '/two/', '/three/', '/four/', '/five/', '/six/', '/seven/', '/eight/', '/nine/'],
             ['one1one', 'two2two', 'three3three', 'four4four', 'five5five', 'six6six', 'seven7seven', 'eight8eight', 'nine9nine'],
