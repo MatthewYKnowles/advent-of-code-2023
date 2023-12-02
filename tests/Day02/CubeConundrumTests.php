@@ -27,15 +27,15 @@ class CubeConundrumTests extends TestCase
             ['Game 1: 14 green', 0],
             ['Game 1: 14 blue', 1],
             ['Game 1: 15 blue', 0],
-            ['Game 1: 14 blue, 1 blue', 0],
-            ['Game 1: 13 green, 1 green', 0],
-            ['Game 1: 12 red, 1 red', 0],
+            ['Game 1: 14 blue, 1 blue', 1],
+            ['Game 1: 13 green, 1 green', 1],
+            ['Game 1: 12 red, 1 red', 1],
             ['Game 1: 12 red, 1 green, 4 blue', 1],
-            ['Game 1: 12 red; 12 red, 1 red', 0],
-            ['Game 1: 13 green; 13 green, 1 green', 0],
-            ['Game 1: 14 blue; 14 blue, 1 blue', 0],
-            ["Game 1: 1 blue\nGame 2: 1 blue", 3],
-            [self::INPUT, 635],
+            ['Game 1: 12 red; 12 red, 1 red', 1],
+            ['Game 1: 13 green; 13 green, 1 green', 1],
+            ['Game 1: 14 blue; 14 blue, 1 blue', 1],
+            ["Game 1: 14 blue; 15 blue, 1 blue\nGame 2: 1 blue\nGame 3: 1 blue", 5],
+            [self::INPUT, 2685],
         ];
     }
 
@@ -46,7 +46,7 @@ class CubeConundrumTests extends TestCase
         static::assertSame($sumOfPossibleGames, $result);
     }
 
-    private const INPUT = "Game 1: 4 blue, 16 green, 2 red; 5 red, 11 blue, 16 green; 9 green, 11 blue; 10 blue, 6 green, 4 red
+    private const INPUT = 'Game 1: 4 blue, 16 green, 2 red; 5 red, 11 blue, 16 green; 9 green, 11 blue; 10 blue, 6 green, 4 red
 Game 2: 15 green, 20 red, 8 blue; 12 green, 7 red; 10 green, 2 blue, 15 red; 13 blue, 15 red
 Game 3: 8 red, 2 blue; 3 green, 10 blue, 10 red; 7 green, 4 blue, 7 red; 8 red, 6 green, 13 blue; 4 green, 3 blue, 10 red; 7 blue, 7 green, 5 red
 Game 4: 13 green, 14 blue, 9 red; 6 green, 14 red, 18 blue; 9 red, 11 green, 3 blue; 11 green, 10 red, 14 blue; 17 blue, 3 red, 4 green; 17 blue, 1 red, 9 green
@@ -145,5 +145,5 @@ Game 96: 2 blue, 18 green, 8 red; 13 green, 3 blue, 3 red; 3 blue, 15 red, 8 gre
 Game 97: 14 blue, 2 red; 15 blue, 1 green, 2 red; 3 red, 6 blue, 1 green; 1 green, 14 blue, 4 red
 Game 98: 4 blue, 9 red; 10 red, 1 green, 11 blue; 7 blue, 1 red; 1 red, 6 blue, 1 green
 Game 99: 7 red, 6 green, 2 blue; 8 red; 16 green, 7 red, 4 blue
-Game 100: 1 red, 1 green, 9 blue; 6 blue, 4 green, 3 red; 4 red, 2 green; 3 green, 2 red, 11 blue; 6 green, 5 blue, 1 red";
+Game 100: 1 red, 1 green, 9 blue; 6 blue, 4 green, 3 red; 4 red, 2 green; 3 green, 2 red, 11 blue; 6 green, 5 blue, 1 red';
 }
