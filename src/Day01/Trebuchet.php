@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Day01a;
+namespace Day01;
 
 class Trebuchet
 {
