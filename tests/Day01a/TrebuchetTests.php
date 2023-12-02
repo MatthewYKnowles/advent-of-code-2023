@@ -7,121 +7,53 @@ use PHPUnit\Framework\TestCase;
 
 class TrebuchetTests extends TestCase
 {
-    public function testSingleNumber(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = '1';
+    private Trebuchet $trebuchet;
 
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(11, $result);
-    }
-
-    public function testDifferentSingleNumber(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = '2';
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(22, $result);
-    }
-    public function testWithLetters(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'd2fdsaf';
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(22, $result);
-    }
-    public function testWithTwoDigits(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'd2fdsa3f';
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(23, $result);
-    }
-
-    public function testWithThreeDigits(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'd2fdsa3f5tr';
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(25, $result);
-    }
-
-    public function testWithMultipleLines(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument =
-"1
-2";
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(33, $result);
-    }
-
-    public function testWithMultipleLinesAndMultipleNumbers(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'ab1cd4ef5
-h2ijk345
-4jlkjf5';
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(15 + 25 + 45, $result);
-    }
-
-    public function testFinal(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = $this->getFinalCalibrationDocument();
-
-        $result = $trebuchet->determineCalibrationValue($calibrationDocument);
-
-        static::assertSame(55108, $result);
-    }
-
-    public function testSpelledOutNumbersOne(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'one';
-
-        $result = $trebuchet->determineCalibrationValueWithEnglishNumbers($calibrationDocument);
-
-        static::assertSame(11, $result);
-    }
-
-    public function testSpelledOutNumbersTwo(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'twone';
-
-        $result = $trebuchet->determineCalibrationValueWithEnglishNumbers($calibrationDocument);
-
-        static::assertSame(21, $result);
-    }
-    public function testSpelledOutNumbersRemainingNumbers(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = 'threeffour
-        five5six
-        seven
-        eightnine';
-
-        $result = $trebuchet->determineCalibrationValueWithEnglishNumbers($calibrationDocument);
-
-        static::assertSame(34+56+77+89, $result);
-    }
-
-    public function testSpelledOutNumbersFinalResult(): void {
-        $trebuchet = new Trebuchet();
-        $calibrationDocument = $this->getFinalCalibrationDocument();
-
-        $result = $trebuchet->determineCalibrationValueWithEnglishNumbers($calibrationDocument);
-
-        static::assertSame(56324, $result);
-    }
-
-    public function getFinalCalibrationDocument(): string
+    protected function setUp(): void
     {
-        return
+        parent::setUp();
+        $this->trebuchet = new Trebuchet();
+    }
+
+    public static function calibrationOnlyArabicNumbers(): array
+    {
+        return [
+            ['1', 11],
+            ['2', 22],
+            'withLetters' => ['d3fdsaf', 33],
+            'withThreeNumbers' => ['d2fdsa3f5tr', 25],
+            'multiple lines' => ["1\n2", 11 + 22],
+            'multiple lines & numbers' => ["ab1cd4ef5\nh2ijk345\n4jlkjf5", 15 + 25 + 45],
+            'final test' => [self::FINAL_CALIBRATION, 55108]
+        ];
+    }
+
+    /** @dataProvider calibrationOnlyArabicNumbers */
+    public function testCalibrationSummationOnlyArabicNumbers(string $calibration, int $sumOfCalibrationValues): void {
+        $result = $this->trebuchet->determineCalibrationValue($calibration);
+
+        static::assertSame($sumOfCalibrationValues, $result);
+    }
+
+    public static function calibrationArabicAndEnglishNumbers(): array
+    {
+        return [
+            ['one', 11],
+            ['twone', 21],
+            ["threeffour\nfive5six\nseven\neightnine", 34 + 56 + 77 + 89],
+            ["threeffour\nfive5six\nseven\neightnine", 34 + 56 + 77 + 89],
+            'final test' => [self::FINAL_CALIBRATION, 56324]
+        ];
+    }
+
+    /** @dataProvider calibrationArabicAndEnglishNumbers */
+    public function testCalibrationSummationArabicAndEnglishNumbers(string $calibration, int $sumOfCalibrationValues): void {
+        $result = $this->trebuchet->determineCalibrationValueWithEnglishNumbers($calibration);
+
+        static::assertSame($sumOfCalibrationValues, $result);
+    }
+
+    private const FINAL_CALIBRATION =
             "gsjgklneight6zqfz
 7one718onegfqtdbtxfcmd
 xvtfhkm8c9
@@ -1122,5 +1054,4 @@ gldsixrhss186seven6
 gnpksz4
 4919
 pbc19";
-    }
 }
