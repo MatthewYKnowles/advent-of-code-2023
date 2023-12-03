@@ -51,14 +51,14 @@ class CubeConundrumTests extends TestCase
     {
         return [
             ['Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green', 48],
-            ["Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green\nGame 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue", 48 + 12],
+            ["Game 1: 4 red; 2 green, 6 blue; 2 green\nGame 2: 1 blue, 2 green; 3 green, 4 blue, 1 red;, 1 blue", 48 + 12],
             [self::INPUT, 83707],
         ];
     }
 
     /** @dataProvider games2 */
     public function test2(string $game, int $sumOfPossibleGames): void {
-        $result = $this->cubeConundrum->determine2($game);
+        $result = $this->cubeConundrum->determineSumOfPowerOfFewestCubes($game);
 
         static::assertSame($sumOfPossibleGames, $result);
     }
