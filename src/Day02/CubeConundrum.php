@@ -11,7 +11,7 @@ class CubeConundrum
         foreach ($games as $game) {
             $gameNumberAndPieces = explode(': ', $game);
             $gameNumber = (int) str_replace('Game ', '', $gameNumberAndPieces[0]);
-            $sets = explode('; ', $gameNumberAndPieces[1]);
+            $sets = $this->determinePiecesSets($game);
             if ($this->isValidGame($sets)){
                 $total += $gameNumber;
             };
@@ -47,11 +47,11 @@ class CubeConundrum
     private function determineMinimumPiecesRequired(array $subsets, string $color): mixed
     {
         return array_reduce($subsets, function (int $maxNumber, string $cubes) use ($color) {
+            $numberOfCubes = 0;
             if (str_contains($cubes, $color)) {
                 $numberOfCubes = (int)str_replace(" $color", '', $cubes);
-                $maxNumber = max($numberOfCubes, $maxNumber);
             }
-            return $maxNumber;
+            return  max($numberOfCubes, $maxNumber);
         }, 0);
     }
 
@@ -63,18 +63,8 @@ class CubeConundrum
 
     private function isValidGame(array $sets): bool
     {
-        foreach ($sets as $set) {
-            $subsets = explode(', ', $set);
-            if ($this->anyNumberOfCubesToBigForColor($subsets, 'red', 12)){
-                return false;
-            };
-            if ($this->anyNumberOfCubesToBigForColor($subsets, 'green', 13)){
-                return false;
-            };
-            if ($this->anyNumberOfCubesToBigForColor($subsets, 'blue', 14)){
-                return false;
-            };
-        }
-        return true;
+        return !$this->anyNumberOfCubesToBigForColor($sets, 'blue', 14)
+            && !$this->anyNumberOfCubesToBigForColor($sets, 'green', 13)
+            && !$this->anyNumberOfCubesToBigForColor($sets, 'red', 12);
     }
 }
