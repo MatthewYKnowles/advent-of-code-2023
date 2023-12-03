@@ -11,42 +11,11 @@ class CubeConundrum
         foreach ($games as $game) {
             $gameNumberAndPieces = explode(': ', $game);
             $gameNumber = (int) str_replace('Game ', '', $gameNumberAndPieces[0]);
-            $valid = true;
             $sets = explode('; ', $gameNumberAndPieces[1]);
-            foreach ($sets as $set) {
-                if (str_contains($set, 'red')) {
-                    $subsets = explode(', ', $set);
-                    $numbers = $this->collectNumbersOfAColor($subsets, 'red');
-                    foreach ($numbers as $number) {
-                        if ($number > 12) {
-                            $valid = false;
-                        }
-                    }
-                }
-                if (str_contains($set, 'green')) {
-                    $subsets = explode(', ', $set);
-                    $numbers = $this->collectNumbersOfAColor($subsets, 'green');
-                    foreach ($numbers as $number) {
-                        if ($number > 13) {
-                            $valid = false;
-                        }
-                    }
-                }
-                if (str_contains($set, 'blue')) {
-                    $subsets = explode(', ', $set);
-                    $numbers = $this->collectNumbersOfAColor($subsets, 'blue');
-                    foreach ($numbers as $number) {
-                        if ($number > 14) {
-                            $valid = false;
-                        }
-                    }
-                }
-            }
-            if ($valid){
+            if ($this->isValidGame($sets)){
                 $total += $gameNumber;
-            }
+            };
         }
-
         return $total;
     }
 
@@ -55,14 +24,15 @@ class CubeConundrum
         return array_reduce($games, fn (int $total, string $game) => $total + $this->determinePowerOfMinimumSetOfCubes($game), 0);
     }
 
-    private function collectNumbersOfAColor(array $subsets, string $color): mixed
+    private function anyNumberOfCubesToBigForColor(array $subsets, string $color, int $maxNumber): mixed
     {
-        return array_reduce($subsets, function (array $numbers, string $cubes) use ($color) {
+        return array_reduce($subsets, function (bool $tooBig, string $cubes) use ($color, $maxNumber) {
             if (str_contains($cubes, $color)) {
-                $numbers[] = (int)str_replace(" $color", '', $cubes);
+                $number = (int)str_replace(" $color", '', $cubes);
+                $tooBig = $tooBig || $number > $maxNumber;
             }
-            return $numbers;
-        }, []);
+            return $tooBig;
+        }, false);
     }
 
     private function determinePowerOfMinimumSetOfCubes(string $game): int
@@ -89,5 +59,22 @@ class CubeConundrum
     {
         $gamePieces = explode(': ', $game)[1];
         return preg_split('/; |, /', $gamePieces);
+    }
+
+    private function isValidGame(array $sets): bool
+    {
+        foreach ($sets as $set) {
+            $subsets = explode(', ', $set);
+            if ($this->anyNumberOfCubesToBigForColor($subsets, 'red', 12)){
+                return false;
+            };
+            if ($this->anyNumberOfCubesToBigForColor($subsets, 'green', 13)){
+                return false;
+            };
+            if ($this->anyNumberOfCubesToBigForColor($subsets, 'blue', 14)){
+                return false;
+            };
+        }
+        return true;
     }
 }
