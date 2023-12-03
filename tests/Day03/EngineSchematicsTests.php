@@ -21,6 +21,9 @@ class EngineSchematicsTests extends TestCase
             ['1*', 1],
             ['2*', 2],
             ['2*2', 4],
+            ['2*25', 27],
+            ['23*5..', 28],
+            ['23.5..', 0],
         ];
     }
 
