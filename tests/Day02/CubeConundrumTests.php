@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class CubeConundrumTests extends TestCase
 {
-    private CubeConundrum $cubeConundrum;
+    private EngineSchematics $cubeConundrum;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->cubeConundrum = new CubeConundrum();
+        $this->cubeConundrum = new EngineSchematics();
     }
 
     public static function games(): array

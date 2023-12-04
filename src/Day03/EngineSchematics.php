@@ -17,8 +17,10 @@ class EngineSchematics
                 if ($this->characterIsADigit($character)) {
                     $maybeValidNumber .= $character;
                 }
-                if (!$this->characterIsADigit($character)) {
-                    $indexBeforeNumberStart = $y - strlen($maybeValidNumber) - 1;
+                if (!$this->characterIsADigit($character) || $this->endOfLine($y, $lineCharacters)) {
+                    $indexBeforeNumberStart = !$this->characterIsADigit($character)
+                        ? $y - strlen($maybeValidNumber) - 1
+                        : $y - strlen($maybeValidNumber);
                     $hasSymbolNeighbor = $this->isSpecialChacter($character);
                     if ($indexBeforeNumberStart >= 0) {
                         $previousCharacter = $lineCharacters[$indexBeforeNumberStart];
@@ -28,39 +30,42 @@ class EngineSchematics
                     }
                     if ($x + 1 < count($games)) {
                         $nextGame = $games[$x+1];
-                        if ($this->isSpecialChacter($nextGame[$y])){
-                            $hasSymbolNeighbor = true;
-                        }
-                        $indexBeforeNumberStart = $y - strlen($maybeValidNumber);
+                        $neighbors = [];
                         if ($indexBeforeNumberStart >= 0){
-                            if ($this->isSpecialChacter($nextGame[$indexBeforeNumberStart])){
-                                $hasSymbolNeighbor = true;
-                            }
+                            $neighbors[] = $nextGame[$indexBeforeNumberStart];
                         }
-                    }
-                    if ($hasSymbolNeighbor) {
-                        $validNumbers[] = (int) $maybeValidNumber;
-                    }
-                    $maybeValidNumber = '';
-                }
-                if ($y + 1 === count($lineCharacters)) {
-                    $indexBeforeNumberStart = $y - strlen($maybeValidNumber);
-                    $hasSymbolNeighbor = $this->isSpecialChacter($character);
-                    if ($indexBeforeNumberStart >= 0) {
-                        $previousCharacter = $lineCharacters[$indexBeforeNumberStart];
-                        if ($this->isSpecialChacter($previousCharacter)) {
+                        for ($h = 0; $h < strlen($maybeValidNumber); $h++) {
+                            $neighbors[] = $nextGame[$indexBeforeNumberStart + $h + 1];
+                        }
+                        $gameStringLength = strlen($games[$x]);
+                        $potentialIndex = $indexBeforeNumberStart + 1 + strlen($maybeValidNumber);
+                        if ($potentialIndex < $gameStringLength){
+                            $neighbors[] = $nextGame[$potentialIndex];
+                        }
+                        $hasSymbol = array_reduce($neighbors, fn (bool $hasSymbol, string $char) => $hasSymbol ||
+                        $this->isSpecialChacter($char), false);
+                        if ($hasSymbol) {
                             $hasSymbolNeighbor = true;
                         }
                     }
-                    if ($x + 1 < count($games)) {
-                        $nextGame = $games[$x+1];
-                        if ($this->isSpecialChacter($nextGame[$y])){
-                            $hasSymbolNeighbor = true;
-                        }
+                    if ($x - 1 >= 0) {
+                        $previousGame = $games[$x-1];
+                        $neighbors = [];
                         if ($indexBeforeNumberStart >= 0){
-                            if ($this->isSpecialChacter($nextGame[$indexBeforeNumberStart])){
-                                $hasSymbolNeighbor = true;
-                            }
+                            $neighbors[] = $previousGame[$indexBeforeNumberStart];
+                        }
+                        for ($h = 0; $h < strlen($maybeValidNumber); $h++) {
+                            $neighbors[] = $previousGame[$indexBeforeNumberStart + $h + 1];
+                        }
+                        $gameStringLength = strlen($games[$x]);
+                        $potentialIndex = $indexBeforeNumberStart + 1 + strlen($maybeValidNumber);
+                        if ($potentialIndex < $gameStringLength){
+                            $neighbors[] = $previousGame[$potentialIndex];
+                        }
+                        $hasSymbol = array_reduce($neighbors, fn (bool $hasSymbol, string $char) => $hasSymbol ||
+                            $this->isSpecialChacter($char), false);
+                        if ($hasSymbol) {
+                            $hasSymbolNeighbor = true;
                         }
                     }
                     if ($hasSymbolNeighbor) {
@@ -81,5 +86,10 @@ class EngineSchematics
     public function isSpecialChacter(mixed $character): bool
     {
         return $character !== '.' && !$this->characterIsADigit($character);
+    }
+
+    public function endOfLine(int $y, array $lineCharacters): bool
+    {
+        return $y + 1 === count($lineCharacters);
     }
 }
