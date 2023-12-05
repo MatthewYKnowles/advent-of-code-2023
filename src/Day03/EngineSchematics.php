@@ -50,7 +50,26 @@ class EngineSchematics
         return array_sum($validNumbers);
     }
 
-    private function getSubOfCharactersInALine(string $line, int $firstIndex, int $subsetLength) {
+
+    public function sumOfGearRatios(string $engineSchematics): int
+    {
+        $lines = explode("\n", $engineSchematics);
+        $lineLength = strlen($lines[0]);
+        $sumOfRatios = 0;
+        for ($y = 0; $y < $lineLength; $y++) {
+            $character = $lines[0][$y];
+            if ($y > 0 && $character === '*') {
+                $surroundingNumbers = [];
+                $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheLeft($lines[0], $y-1));
+                $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheRight($lines[0], $y+1));
+                return $surroundingNumbers[0] * $surroundingNumbers[1];
+            }
+        }
+        return 0;
+    }
+
+    private function getSubOfCharactersInALine(string $line, int $firstIndex, int $subsetLength): array
+    {
         $items = [];
         for ($h = 0; $h <= $subsetLength; $h++) {
             $items[] = $line[$firstIndex + $h];
@@ -77,4 +96,22 @@ class EngineSchematics
         return $y + 1 === $lineLength;
     }
 
+    private function numberToTheLeft(string $line, $neighborIndex): array
+    {
+        $number = '';
+        for ($x = $neighborIndex; $x >= 0; $x--) {
+            $number = $line[$x] . $number;
+        }
+        return [(int) $number];
+    }
+
+    private function numberToTheRight(string $line, $neighborIndex): array
+    {
+        $number = '';
+        for ($x = $neighborIndex; $x < strlen($line); $x++) {
+            $character = $line[$x];
+            $number .= $character;
+        }
+        return [(int) $number];
+    }
 }

@@ -52,33 +52,15 @@ class EngineSchematicsTests extends TestCase
     public static function sets2(): array
     {
         return [
-            ['1*', 1],
-            ['2*', 2],
-            ['*2', 2],
-            ['2*2', 4],
-            ['2*25', 27],
-            ['23*5..', 28],
-            ['23.5..', 0],
-            ['23.5.%', 0],
-            ["1\n.", 0],
-            ["1\n*", 1],
-            [".2\n*.", 2],
-            [".3.\n..*", 3],
-            ["..23..\n.*....", 23],
-            ["..23..\n....*.", 23],
-            ["..23..\n..*...", 23],
-            ["..23..\n...*..", 23],
-            [".*....\n..42..", 42],
-            [".1*.\n..42", 43],
-            ["256*\n..42", 298],
-            [self::SCHEMATIC, 498559],
+
+            ['10*10', 100],
         ];
     }
 
     /** @dataProvider sets2 */
     public function test2(string $engineSchematics, int $sumOfEngineSchematicNumbers): void
     {
-        $result = $this->engineSchematics->determineSumOfPartNumbers($engineSchematics);
+        $result = $this->engineSchematics->sumOfGearRatios($engineSchematics);
 
         static::assertSame($sumOfEngineSchematicNumbers, $result);
     }
