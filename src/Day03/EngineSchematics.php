@@ -3,72 +3,44 @@ declare(strict_types=1);
 
 namespace Day03;
 
+use function strlen;
+
 class EngineSchematics
 {
     public function determineSumOfPartNumbers(string $engineSchematics): int
     {
-        $games = explode("\n", $engineSchematics);
+        $lines = explode("\n", $engineSchematics);
+        $lineLength = strlen($lines[0]);
         $validNumbers = [];
-        for ($x = 0; $x < count($games); $x++) {
-            $lineCharacters = str_split($games[$x]);
+        for ($x = 0; $x < count($lines); $x++) {
             $maybeValidNumber = '';
-            for ($y = 0; $y < count($lineCharacters); $y++) {
-                $character = $lineCharacters[$y];
+            for ($y = 0; $y < $lineLength; $y++) {
+                $character = $lines[$x][$y];
                 if ($this->characterIsADigit($character)) {
                     $maybeValidNumber .= $character;
                 }
-                if (!$this->characterIsADigit($character) || $this->endOfLine($y, $lineCharacters)) {
+                if ($this->isSpecialCharacter($character)){
+                    $validNumbers[] = (int) $maybeValidNumber;
+                    $maybeValidNumber = '';
+                }
+                if (strlen($maybeValidNumber) > 0 && ($character === '.' || $this->endOfLine($y,
+                            $lineLength))) {
                     $indexBeforeNumberStart = !$this->characterIsADigit($character)
                         ? $y - strlen($maybeValidNumber) - 1
                         : $y - strlen($maybeValidNumber);
-                    $hasSymbolNeighbor = $this->isSpecialChacter($character);
+                    $items = [$character];
                     if ($indexBeforeNumberStart >= 0) {
-                        $previousCharacter = $lineCharacters[$indexBeforeNumberStart];
-                        if ($this->isSpecialChacter($previousCharacter)) {
-                            $hasSymbolNeighbor = true;
-                        }
+                        $items[] = $lines[$x][$indexBeforeNumberStart];
                     }
-                    if ($x + 1 < count($games)) {
-                        $nextGame = $games[$x+1];
-                        $neighbors = [];
-                        if ($indexBeforeNumberStart >= 0){
-                            $neighbors[] = $nextGame[$indexBeforeNumberStart];
-                        }
-                        for ($h = 0; $h < strlen($maybeValidNumber); $h++) {
-                            $neighbors[] = $nextGame[$indexBeforeNumberStart + $h + 1];
-                        }
-                        $gameStringLength = strlen($games[$x]);
-                        $potentialIndex = $indexBeforeNumberStart + 1 + strlen($maybeValidNumber);
-                        if ($potentialIndex < $gameStringLength){
-                            $neighbors[] = $nextGame[$potentialIndex];
-                        }
-                        $hasSymbol = array_reduce($neighbors, fn (bool $hasSymbol, string $char) => $hasSymbol ||
-                        $this->isSpecialChacter($char), false);
-                        if ($hasSymbol) {
-                            $hasSymbolNeighbor = true;
-                        }
+                    if ($x + 1 < count($lines)) {
+                        $items = array_merge($items, $this->getSubOfCharactersInALine($lines[$x+1], $indexBeforeNumberStart, strlen($maybeValidNumber)));
                     }
                     if ($x - 1 >= 0) {
-                        $previousGame = $games[$x-1];
-                        $neighbors = [];
-                        if ($indexBeforeNumberStart >= 0){
-                            $neighbors[] = $previousGame[$indexBeforeNumberStart];
-                        }
-                        for ($h = 0; $h < strlen($maybeValidNumber); $h++) {
-                            $neighbors[] = $previousGame[$indexBeforeNumberStart + $h + 1];
-                        }
-                        $gameStringLength = strlen($games[$x]);
-                        $potentialIndex = $indexBeforeNumberStart + 1 + strlen($maybeValidNumber);
-                        if ($potentialIndex < $gameStringLength){
-                            $neighbors[] = $previousGame[$potentialIndex];
-                        }
-                        $hasSymbol = array_reduce($neighbors, fn (bool $hasSymbol, string $char) => $hasSymbol ||
-                            $this->isSpecialChacter($char), false);
-                        if ($hasSymbol) {
-                            $hasSymbolNeighbor = true;
-                        }
+                        $items = array_merge($items, $this->getSubOfCharactersInALine($lines[$x-1], $indexBeforeNumberStart,
+                            strlen($maybeValidNumber)));
                     }
-                    if ($hasSymbolNeighbor) {
+                    $hasSymbol = array_reduce($items, fn (bool $hasSymbol, string $char) => $hasSymbol || $this->isSpecialCharacter($char), false);
+                    if ($hasSymbol) {
                         $validNumbers[] = (int) $maybeValidNumber;
                     }
                     $maybeValidNumber = '';
@@ -78,18 +50,31 @@ class EngineSchematics
         return array_sum($validNumbers);
     }
 
-    public function characterIsADigit(mixed $character): int|false
+    private function getSubOfCharactersInALine(string $line, int $firstIndex, int $subsetLength) {
+        $items = [];
+        for ($h = 0; $h <= $subsetLength; $h++) {
+            $items[] = $line[$firstIndex + $h];
+        }
+        $potentialIndex = $firstIndex + 1 + $subsetLength;
+        if ($potentialIndex < strlen($line)){
+            $items[] = $line[$potentialIndex];
+        }
+        return $items;
+    }
+
+    private function characterIsADigit(string $character): int|false
     {
         return preg_match('/\d/', $character);
     }
 
-    public function isSpecialChacter(mixed $character): bool
+    private function isSpecialCharacter(string $character): bool
     {
         return $character !== '.' && !$this->characterIsADigit($character);
     }
 
-    public function endOfLine(int $y, array $lineCharacters): bool
+    private function endOfLine(int $y, int $lineLength): bool
     {
-        return $y + 1 === count($lineCharacters);
+        return $y + 1 === $lineLength;
     }
+
 }
