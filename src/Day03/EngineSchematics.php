@@ -56,15 +56,24 @@ class EngineSchematics
         $lines = explode("\n", $engineSchematics);
         $lineLength = strlen($lines[0]);
         $sumOfRatios = 0;
-        for ($y = 0; $y < $lineLength; $y++) {
-            $character = $lines[0][$y];
-            if ($y > 0 && $character === '*') {
-                $surroundingNumbers = [];
-                $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheLeft($lines[0], $y-1));
-                $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheRight($lines[0], $y+1));
-                return $surroundingNumbers[0] * $surroundingNumbers[1];
+        for ($x = 0; $x < count($lines); $x++) {
+            for ($y = 0; $y < $lineLength; $y++) {
+                $character = $lines[$x][$y];
+                if ($y > 0 && $character === '*') {
+                    $surroundingNumbers = [];
+                    if($x-1 >= 0) {
+                        $surroundingNumbers = array_merge($surroundingNumbers, $this->numbersOnNeighborLine($lines[$x-1], $y-1));
+                    }
+                    if($x+1 < count($lines)) {
+                        $surroundingNumbers = array_merge($surroundingNumbers, $this->numbersOnNeighborLine($lines[$x+1], $y-1));
+                    }
+                    $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheLeft($lines[$x], $y-1));
+                    $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheRight($lines[$x], $y+1));
+                    return $surroundingNumbers[0] * $surroundingNumbers[1];
+                }
             }
         }
+
         return 0;
     }
 
@@ -96,22 +105,89 @@ class EngineSchematics
         return $y + 1 === $lineLength;
     }
 
-    private function numberToTheLeft(string $line, $neighborIndex): array
+    private function numberToTheLeft(string $line, int $neighborIndex): array
     {
         $number = '';
         for ($x = $neighborIndex; $x >= 0; $x--) {
-            $number = $line[$x] . $number;
+            $character = $line[$x];
+            if (!$this->characterIsADigit($character)) {
+                return [(int) $number];
+            }
+            $number = $character . $number;
         }
         return [(int) $number];
     }
 
-    private function numberToTheRight(string $line, $neighborIndex): array
+    private function numberToTheRight(string $line, int $neighborIndex): array
     {
         $number = '';
         for ($x = $neighborIndex; $x < strlen($line); $x++) {
             $character = $line[$x];
+            if (!$this->characterIsADigit($character)) {
+                return [(int) $number];
+            }
             $number .= $character;
         }
         return [(int) $number];
+    }
+
+    private function numbersOnNeighborLine(string $line, int $neighborIndex)
+    {
+        $numbers = [];
+        $number = '';
+        $index = $neighborIndex;
+        while ($index > 0) {
+            $character = $line[$index];
+            if (!$this->characterIsADigit($character)) {
+                break;
+            }
+            $index--;
+        }
+        while ($index <= strlen($line)){
+            $character = $line[$index];
+            if (!$this->characterIsADigit($character)) {
+                if (strlen($number) > 0){
+                    $numbers[] = (int) $number;
+                    $number = '';
+                }
+                break;
+            }
+            $number .= $character;
+            $index++;
+        }
+
+        if ($index === $neighborIndex) {
+            $index++;
+            while ($index <= strlen($line)){
+                $character = $line[$index];
+                if (!$this->characterIsADigit($character)) {
+                    if (strlen($number) > 0){
+                        $numbers[] = (int) $number;
+                        $number = '';
+                    }
+                    break;
+                }
+                $number .= $character;
+                $index++;
+            }
+        }
+
+        if ($index < $neighborIndex + 2) {
+            $index++;
+            while ($index <= strlen($line)){
+                $character = $line[$index];
+                if (!$this->characterIsADigit($character)) {
+                    if (strlen($number) > 0){
+                        $numbers[] = (int) $number;
+                        $number = '';
+                    }
+                    break;
+                }
+                $number .= $character;
+                $index++;
+            }
+        }
+
+        return $numbers;
     }
 }
