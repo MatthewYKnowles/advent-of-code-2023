@@ -56,11 +56,11 @@ class EngineSchematics
         $lines = explode("\n", $engineSchematics);
         $lineLength = strlen($lines[0]);
         $sumOfRatios = 0;
-        for ($x = 0; $x < count($lines); $x++) {
-            for ($y = 0; $y < $lineLength; $y++) {
+        $surroundingNumbers = [];
+        for ($x = 0; $x <= count($lines); $x++) {
+            for ($y = 0; $y <= $lineLength; $y++) {
                 $character = $lines[$x][$y];
-                if ($y > 0 && $character === '*') {
-                    $surroundingNumbers = [];
+                if ($character === '*') {
                     if($x-1 >= 0) {
                         $surroundingNumbers = array_merge($surroundingNumbers, $this->numbersOnNeighborLine($lines[$x-1], $y-1));
                     }
@@ -69,12 +69,15 @@ class EngineSchematics
                     }
                     $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheLeft($lines[$x], $y-1));
                     $surroundingNumbers = array_merge($surroundingNumbers, $this->numberToTheRight($lines[$x], $y+1));
-                    return $surroundingNumbers[0] * $surroundingNumbers[1];
+                    if (count($surroundingNumbers) === 2) {
+                        $sumOfRatios += $surroundingNumbers[0] * $surroundingNumbers[1];
+                    }
+                    $surroundingNumbers = [];
                 }
             }
         }
 
-        return 0;
+        return $sumOfRatios;
     }
 
     private function getSubOfCharactersInALine(string $line, int $firstIndex, int $subsetLength): array
@@ -111,11 +114,14 @@ class EngineSchematics
         for ($x = $neighborIndex; $x >= 0; $x--) {
             $character = $line[$x];
             if (!$this->characterIsADigit($character)) {
-                return [(int) $number];
+                break;
             }
             $number = $character . $number;
         }
-        return [(int) $number];
+        if (strlen($number) > 0) {
+            return [(int) $number];
+        }
+        return [];
     }
 
     private function numberToTheRight(string $line, int $neighborIndex): array
@@ -124,25 +130,31 @@ class EngineSchematics
         for ($x = $neighborIndex; $x < strlen($line); $x++) {
             $character = $line[$x];
             if (!$this->characterIsADigit($character)) {
-                return [(int) $number];
+                break;
             }
             $number .= $character;
         }
-        return [(int) $number];
+        if (strlen($number) > 0) {
+            return [(int) $number];
+        }
+        return [];
     }
 
     private function numbersOnNeighborLine(string $line, int $neighborIndex)
     {
         $numbers = [];
         $number = '';
-        $index = $neighborIndex;
-        while ($index > 0) {
+        $index = max($neighborIndex, 0);
+        while ($index >= 0) {
             $character = $line[$index];
             if (!$this->characterIsADigit($character)) {
+                $index++;
                 break;
+            } else {
+                $index--;
             }
-            $index--;
         }
+        $index = max($index, 0);
         while ($index <= strlen($line)){
             $character = $line[$index];
             if (!$this->characterIsADigit($character)) {
